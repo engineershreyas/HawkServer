@@ -30,8 +30,8 @@ def doOperation(sqlCommand, args, retrieve, size):
     result = None
     try:
         with connection.cursor() as cursor:
+            cursor.execute(sqlCommand, args)
             if retrieve == True:
-                cursor.execute(sqlCommand, args)
                 if size <= 0:
                     result = cursor.fetchall()
                 elif size == 1:
