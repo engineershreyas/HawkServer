@@ -14,3 +14,5 @@ Currently, the doOperation() function takes in a command, whether or not it is a
 This module is a python api for getting data from [SpotCrime](https://www.spotcrime.com).
 We can pass in latitude, longitude, and a radius to get this data.
 This is to be used to populate our personal database, not to show data to the client.
+
+# IN PROGRESS
