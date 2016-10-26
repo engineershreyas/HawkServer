@@ -1,5 +1,5 @@
 import requests
-import dbhelper
+import dcapi
 
 baseURL = "http://api.spotcrime.com/crimes.json"
 key = "."
@@ -18,4 +18,4 @@ def getCrimeData(lat, lon, radius):
         latitude = crime.lat
         #longitude
         longitude = crime.lon
-        #TODO: add in method here (create in separate module) that uploads this data to DB if it isnt there already
+        dcapi.putCrimeIfNecessary(cType, date, latitude, longitude)
