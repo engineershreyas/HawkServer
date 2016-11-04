@@ -1,34 +1,40 @@
 import dbhelper
 import geocoder
 
-#TODO: put in tablename
-tableName = ""
+
 
 def putCrimeIfNecessary(cType, date, lat, lon):
     cId = generateId(date, lat, lon)
-    sqlCommand = "SELECT * FROM " + tablename  + " t WHERE t.cId = `%(cId)`"
-    args = {'cId' : cId}
-    result  = dbhelper.doOperation(sqlCommand, args, True, 1)
+    sqlCommand = "SELECT * FROM crimes t WHERE t.cId = " + wrapApos(cId)
+    result  = dbhelper.doOperation(sqlCommand, True, 1)
     if result == None:
         putCrime(cId, cType, date, lat, lon)
 
 def putCrime(cId, cType, date, lat, lon):
-    sqlCommand = "INSERT INTO " + tableName + " ( cId, cType, geo, datetime, citystate ) VALUES (`%(cId)`, `%(cType)`, `%(geo)`, `%(datetime)`, `%(citystate)`)"
     cityState = getCityState(lat, lon)
-    geo = lat + "," + lon
-    args = {'cId' : cId, 'datetime' : date, 'geo' : geo, 'cType' : cType, 'citystate' : cityState}
-    dbhelper.doOperation(sqlCommand, args, False, 0)
+    geo = str(lat) + "," + str(lon)
+    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(geo) + ", " + wrapApos(cityState) + ")"
+    dbhelper.doOperation(sqlCommand, False, 0)
+
+def wrapApos(word):
+    return "\'" + word + "\'"
 
 #helper method to create id for crime
 def generateId(date,lat,lon):
     dateNoSpaces = date.replace(" ","")
     dateNoSlashes = dateNoSpaces.replace("/","")
     dateNoColons = dateNoSlashes.replace(":","")
+    dateNoPM = dateNoColons.replace("PM","")
+    dateNoAM = dateNoPM.replace("AM","")
     l = []
-    l.append(dateNoColons)
-    l.append(lat)
-    l.append(lon)
+    l.append(dateNoAM)
+    latStr = str(lat)
+    lonStr = str(lon)
+    l.append(latStr)
+    l.append(lonStr)
     cId = ''.join(l)
+    cId = cId.replace("-", "")
+    cId = cId.replace(".","")
     return cId
 
 #helper method to get city state
@@ -38,5 +44,5 @@ def getCityState(lat, lon):
     g = geocoder.google([latD, lonD], method='reverse')
     city = g.city
     state = g.state
-    cityState = city + state
+    cityState = city + "," + state
     return cityState

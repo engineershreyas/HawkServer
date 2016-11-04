@@ -8,14 +8,18 @@ key = "."
 def getCrimeData(lat, lon, radius):
     payload = {'key' : key, 'lat' : lat, 'lon' : lon, 'radius' : radius}
     r = requests.get(baseURL, params=payload)
-    crimes = r.crimes
+    data = r.json()
+    crimes = data['crimes']
+    count = 0
     for crime in crimes:
         #the type of the crime
-        cType = crime.type
+        cType = crime['type']
         #date of the crime with time in string format "MM/DD/YY HH:SS AM/PM"
-        date = crime.date
+        date = crime['date']
         #latitude
-        latitude = crime.lat
+        latitude = crime['lat']
         #longitude
-        longitude = crime.lon
+        longitude = crime['lon']
+        count = count + 1
         dcapi.putCrimeIfNecessary(cType, date, latitude, longitude)
+    print str(count) + " crimes found"

@@ -1,13 +1,13 @@
 import pymysql.cursors
 
 #database host
-host = None
+host = 'localhost'
 #username for host
-username = None
+username = 'root'
 #password for host
-password = None
+password = 'shreyas'
 #database name
-db = None
+db = 'hawk'
 #charset
 charset = 'utf8mb4'
 #cursor class
@@ -20,17 +20,19 @@ args - a dict representing args for sqlCommand, can be None
 retrieve - a boolean denoting if this is a retrieval operation or NOT
 size - number of results to be returned, will be ignored if retrieve is False, put 0 to get all results
 """
-def doOperation(sqlCommand, args, retrieve, size):
+def doOperation(sqlCommand, retrieve, size):
     connection = pymysql.connect(host=host,
                                  user=username,
                                  password=password,
-                                 db=db,
+                                 database=db,
+                                 autocommit=True,
                                  charset=charset,
                                  cursorclass=cursorclass)
     result = None
     try:
         with connection.cursor() as cursor:
-            cursor.execute(sqlCommand, args)
+            print sqlCommand
+            cursor.execute(sqlCommand)
             if retrieve == True:
                 if size <= 0:
                     result = cursor.fetchall()
@@ -38,8 +40,7 @@ def doOperation(sqlCommand, args, retrieve, size):
                     result = cursor.fetchone()
                 else:
                     result = cursor.fetchmany(size)
-        if retrieve == False:
-            connection.commit()
+        connection.commit()
     finally:
         connection.close()
         return result
