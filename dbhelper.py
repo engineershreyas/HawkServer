@@ -39,6 +39,12 @@ def doOperation(sqlCommand, retrieve, size):
                     result = cursor.fetchone()
                 else:
                     result = cursor.fetchmany(size)
+            else:
+                rowcount = cursor.rowcount
+                if rowcount < 1:
+                    result = {'status' : 'error'}
+                else:
+                    result = {'status' : 'ok'}
         connection.commit()
     finally:
         connection.close()
