@@ -11,15 +11,4 @@ def getCrimeData(lat, lon, radius):
     data = r.json()
     crimes = data['crimes']
     count = 0
-    for crime in crimes:
-        #the type of the crime
-        cType = crime['type']
-        #date of the crime with time in string format "MM/DD/YY HH:SS AM/PM"
-        date = crime['date']
-        #latitude
-        latitude = crime['lat']
-        #longitude
-        longitude = crime['lon']
-        count = count + 1
-        dcapi.putCrimeIfNecessary(cType, date, latitude, longitude)
-    print str(count) + " crimes found"
+    return crimes
