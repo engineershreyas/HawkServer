@@ -76,19 +76,24 @@ def putCrimeIfNecessary(cType, date, lat, lon):
         return putCrime(cId, cType, date, lat, lon)
 
 def putCrime(cId, cType, date, lat, lon):
-    geo = stringifyGeo(lat, lon)
     cityState = getCityState(lat, lon)
-    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(geo) + ", " + wrapApos(cityState) + ")"
+    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + float(lat) + "," + float(lon) + ")"
     result = dbhelper.doOperation(sqlCommand, False, 0)
     if result['status'] == 'error':
         return False
     else:
         return True
 
+#get crimes by geocoordinates and radius (in miles)
+def getCrimes(lat, lon, radius):
+    kilometers = radius * 1600
+    angularRadius = kilometers / 6371
+    #TODO: implement formula -> http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#SphereRadius
+    return None
+
 """Safety Review Related Methods"""
 def postReview(rating, lat, lon, comments, userId):
     rId = 0
-    geo = stringifyGeo(lat, lon)
     cityState = getCityState(lat, lon)
     city = cityState.split(",")[0]
     retrieveSqlCommand = "SELECT score, numOfReviews FROM cities WHERE name = " + wrapApos(city)
@@ -105,7 +110,7 @@ def postReview(rating, lat, lon, comments, userId):
         print 'Updating cities failed'
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
         return message
-    insertSqlCommand = "INSERT INTO reviews VALUES (" + rId + ", " + rating + ", " + wrapApos(geo) + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + ")"
+    insertSqlCommand = "INSERT INTO reviews VALUES (" + rId + ", " + rating + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + + "," + float(lat) + "," + float(lon) + ")"
     res = dbhelper.doOperation(insertSqlCommand, False, 0)
     if res['status'] == 'error':
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
@@ -120,7 +125,7 @@ def getReviewCount():
 
 """HELPER METHODS"""
 
-#helper method to wrap variable in single apostrophes for sql statementx
+#helper method to wrap variable in single apostrophes for sql statements s
 def wrapApos(word):
     return "\'" + word + "\'"
 
@@ -141,11 +146,6 @@ def generateId(date,lat,lon):
     cId = cId.replace("-", "")
     cId = cId.replace(".","")
     return cId
-
-#helper method to create a string version of geocoordinates
-def stringifyGeo(lat, lon):
-    geo = str(lat) + "," + str(lon)
-    return geo
 
 #helper method to get city state
 def getCityState(lat, lon):
