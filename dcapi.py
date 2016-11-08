@@ -4,6 +4,7 @@ import spotcrime
 import bcrypt
 import gunlaws
 import json
+from math import asin, acos, sin, cos
 
 
 """User Related Methods"""
@@ -77,7 +78,7 @@ def putCrimeIfNecessary(cType, date, lat, lon):
 
 def putCrime(cId, cType, date, lat, lon):
     cityState = getCityState(lat, lon)
-    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + float(lat) + "," + float(lon) + ")"
+    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + degreesToRadians(float(lat)) + "," + degreesToRadians(float(lon)) + ")"
     result = dbhelper.doOperation(sqlCommand, False, 0)
     if result['status'] == 'error':
         return False
@@ -88,8 +89,17 @@ def putCrime(cId, cType, date, lat, lon):
 def getCrimes(lat, lon, radius):
     kilometers = radius * 1600
     angularRadius = kilometers / 6371
-    #TODO: implement formula -> http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates#SphereRadius
-    return None
+    latr = degreesToRadians(lat)
+    lonr = degreesToRadians(lon)
+    latmin = latr - angularRadius
+    latmax = latr + angularRadius
+    latt = asin(sin(latr)/cos(angularRadius))
+    delta = asin(sin(angularRadius)/cos(latr))
+    lonmin = lonr - delta
+    lonmax = lonr + delta
+    sqlCommand = "SELECT * FROM crimes WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + "))) <= " + angularRadius
+    results = dbhelper.doOperation(sqlCommand, True, -1)
+    return results
 
 """Safety Review Related Methods"""
 def postReview(rating, lat, lon, comments, userId):
@@ -110,7 +120,9 @@ def postReview(rating, lat, lon, comments, userId):
         print 'Updating cities failed'
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
         return message
-    insertSqlCommand = "INSERT INTO reviews VALUES (" + rId + ", " + rating + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + + "," + float(lat) + "," + float(lon) + ")"
+    latr = degreesToRadians(float(lat))
+    lonr = degreesToRadians(float(lon))
+    insertSqlCommand = "INSERT INTO reviews VALUES (" + rId + ", " + rating + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + + "," + latr + "," + lonr + ")"
     res = dbhelper.doOperation(insertSqlCommand, False, 0)
     if res['status'] == 'error':
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
@@ -124,6 +136,9 @@ def getReviewCount():
     return len(result)
 
 """HELPER METHODS"""
+
+def degreesToRadians(degrees):
+    return degrees * .0174533
 
 #helper method to wrap variable in single apostrophes for sql statements s
 def wrapApos(word):
