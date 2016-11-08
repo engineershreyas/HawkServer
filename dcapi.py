@@ -78,12 +78,15 @@ def putCrimeIfNecessary(cType, date, lat, lon):
 
 def putCrime(cId, cType, date, lat, lon):
     cityState = getCityState(lat, lon)
-    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + degreesToRadians(float(lat)) + "," + degreesToRadians(float(lon)) + ")"
-    result = dbhelper.doOperation(sqlCommand, False, 0)
-    if result['status'] == 'error':
-        return False
+    sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + str(degreesToRadians(float(lat))) + "," + str(degreesToRadians(float(lon))) + ")"
+    if not cityState == None:
+        result = dbhelper.doOperation(sqlCommand, False, 0)
+        if result['status'] == 'error':
+            return False
+        else:
+            return True
     else:
-        return True
+        return False
 
 #get crimes by geocoordinates and radius (in miles)
 def getCrimes(lat, lon, radius):
@@ -97,9 +100,10 @@ def getCrimes(lat, lon, radius):
     delta = asin(sin(angularRadius)/cos(latr))
     lonmin = lonr - delta
     lonmax = lonr + delta
-    sqlCommand = "SELECT * FROM crimes WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + "))) <= " + angularRadius
+    sqlCommand = "SELECT * FROM crimes WHERE (lat >= " + str(latmin)  + " AND lat <=  " +  str(latmax) + ") AND (lon >= " + str(lonmin) + "AND lon <= " + str(lonmax) + ") AND (ACOS(SIN(" + str(latr) + ") * SIN(lat) + COS(" + str(latr) + ") * COS(lat) * COS(lon - (" + str(lonr)  + ")))) <= " + str(angularRadius)
+    results = {}
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return results
+    return json.dumps(results)
 
 """Safety Review Related Methods"""
 def postReview(rating, lat, lon, comments, userId):
@@ -141,14 +145,14 @@ def getReviews(lat, lon, radius):
     delta = asin(sin(angularRadius)/cos(latr))
     lonmin = lonr - delta
     lonmax = lonr + delta
-    sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + "))) <= " + angularRadius
+    sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " + lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + ")))) <= " + angularRadius
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return results
+    return json.dumps(results)
 
 def getReviews(userId):
     sqlCommand = "SELECT * FROM reviews WHERE userId = " + wrapApos(userId)
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return results
+    return json.dumps(results)
 
 def getReviewCount():
     sqlCommand = "SELECT * FROM reviews"
@@ -191,5 +195,7 @@ def getCityState(lat, lon):
     state = g.state
     print city
     print state
-    cityState = city + "," + state
+    cityState = None
+    if not city == None and not state == None:
+        cityState = city + "," + state
     return cityState

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 import dcapi
+import json
 app = Flask(__name__)
 
 @app.route('/')
@@ -25,9 +26,9 @@ def register():
     password = request.form['password']
     success = dcapi.register(userId, email, password)
     if success == False:
-        return {'status' : 'error', 'message' : 'Something went wrong, please try again!'}
+        return json.dumps({'status' : 'error', 'message' : 'Something went wrong, please try again!'})
     else:
-        return {'status' : 'ok', 'message' : 'Registration successful!', 'userId' : userId}
+        return json.dumps({'status' : 'ok', 'message' : 'Registration successful!', 'userId' : userId})
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -35,48 +36,48 @@ def login():
     password = request.form['password']
     success = dcapi.login(userId, password)
     if success == False:
-        return {'status' : 'error', 'message' : 'Login was not successful! Please make sure your email or password is correct'}
+        return json.dumps({'status' : 'error', 'message' : 'Login was not successful! Please make sure your email or password is correct'})
     else:
-        return {'status' : 'ok', 'message' : 'Login successful!', 'userId' : userId}
+        return json.dumps({'status' : 'ok', 'message' : 'Login successful!', 'userId' : userId})
 
-@app.route('/getCrimes'):
+@app.route('/getCrimes')
 def getCrimes():
     lat = request.args.get('lat','')
     lon = request.args.get('lon','')
     radius = request.args.get('radius','')
-    if not checkValidString(lat) and not checkValidString(lon) and not checkValidString(radius):
+    if checkValidString(lat) and checkValidString(lon) and checkValidString(radius):
         try:
             results = dcapi.getCrimes(float(lat), float(lon), float(radius))
-            return {'status' : 'ok', 'results' : results}
+            return json.dumps({'status' : 'ok', 'results' : results})
         except ValueError:
-            return {'status' : 'error', 'message' : 'arguments were not all numbers'}
+            return json.dumps({'status' : 'error', 'message' : 'arguments were not all numbers'})
     else:
-        return {'status' : 'error', 'messgae' : 'invalid arguments'}
+        return json.dumps({'status' : 'error', 'messgae' : 'invalid arguments'})
 
 
-@app.route('/getReviews'):
+@app.route('/getReviews')
 def getReviews():
     lat = request.args.get('lat','')
     lon = request.args.get('lon','')
     radius = request.args.get('radius','')
-    if not checkValidString(lat) and not checkValidString(lon) and not checkValidString(radius):
+    if checkValidString(lat) and checkValidString(lon) and checkValidString(radius):
         try:
             results = dcapi.getReviews(float(lat), float(lon), float(radius))
-            return {'status' : 'ok', 'results' : results}
+            return json.dumps({'status' : 'ok', 'results' : results})
         except ValueError:
-            return {'status' : 'error', 'message' : 'arguments were not all numbers'}
+            return json.dumps({'status' : 'error', 'message' : 'arguments were not all numbers'})
     else:
-        return {'status' : 'error', 'messgae' : 'invalid arguments'}
+        return json.dumps({'status' : 'error', 'messgae' : 'invalid arguments'})
 
 
 @app.route('/getReviewsByUserId')
 def getReviewsByUserId():
     userId = request.args.get('userId','')
     if not checkValidString(userId):
-        return {'status' : 'error', 'message' : 'please enter a valid userId'}
+        return json.dumps({'status' : 'error', 'message' : 'please enter a valid userId'})
     else:
         results = dcapi.getReviews(userId)
-        return {'status' : 'ok' , 'results' : results}
+        return json.dumps({'status' : 'ok' , 'results' : results})
 
 @app.route('/updateGunLaws')
 def uploadGunLaws():
@@ -90,5 +91,5 @@ def test_db():
 
 def checkValidString(string):
     if string == None or len(string) < 1:
-        retun False
+        return False
     return True
