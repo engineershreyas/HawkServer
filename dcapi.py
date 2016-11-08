@@ -130,6 +130,26 @@ def postReview(rating, lat, lon, comments, userId):
     rId = getReviewCount() - 1
     return {'status' : 'success', 'rId' : rId}
 
+def getReviews(lat, lon, radius):
+    kilometers = radius * 1600
+    angularRadius = kilometers / 6371
+    latr = degreesToRadians(lat)
+    lonr = degreesToRadians(lon)
+    latmin = latr - angularRadius
+    latmax = latr + angularRadius
+    latt = asin(sin(latr)/cos(angularRadius))
+    delta = asin(sin(angularRadius)/cos(latr))
+    lonmin = lonr - delta
+    lonmax = lonr + delta
+    sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + "))) <= " + angularRadius
+    results = dbhelper.doOperation(sqlCommand, True, -1)
+    return results
+
+def getReviews(userId):
+    sqlCommand = "SELECT * FROM reviews WHERE userId = " + wrapApos(userId)
+    results = dbhelper.doOperation(sqlCommand, True, -1)
+    return results
+
 def getReviewCount():
     sqlCommand = "SELECT * FROM reviews"
     result = dbhelper.doOperation(sqlCommand, True, -1)
