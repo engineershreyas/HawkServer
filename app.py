@@ -8,16 +8,6 @@ app = Flask(__name__)
 def square_of_distrust():
     return 'Welcome to the Square of Distrust!'
 
-@app.route('/createReview', methods=['POST'])
-def createReview():
-    rating = request.form['rating']
-    lat = request.form['lat']
-    lon = request.form['lon']
-    comments = request.form['comments']
-    userId = request.form['userId']
-    message = dcapi.postReview(rating, lat, lon, comments, userId)
-    return message
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -40,6 +30,17 @@ def login():
     else:
         return json.dumps({'status' : 'ok', 'message' : 'Login successful!', 'userId' : userId})
 
+@app.route('/updateCrimes')
+def update_crimes():
+    lat = request.args.get('lat','')
+    lon = request.args.get('lon','')
+    radius = request.args.get('radius','')
+    if checkValidString(lat) and checkValidString(lon) and checkValidString(radius) and checkValidString(radius):
+        return json.dumps({'status' : 'ok', 'message' : dcapi.updateCrimes(float(lat), float(lon), float(radius))})
+    return json.dumps({'status' : 'error', 'message' : 'invalud arguments'})    
+
+
+
 @app.route('/getCrimes')
 def getCrimes():
     lat = request.args.get('lat','')
@@ -54,6 +55,15 @@ def getCrimes():
     else:
         return json.dumps({'status' : 'error', 'messgae' : 'invalid arguments'})
 
+@app.route('/createReview', methods=['POST'])
+def createReview():
+    rating = request.form['rating']
+    lat = request.form['lat']
+    lon = request.form['lon']
+    comments = request.form['comments']
+    userId = request.form['userId']
+    message = dcapi.postReview(rating, lat, lon, comments, userId)
+    return json.dumps(message)
 
 @app.route('/getReviews')
 def getReviews():
@@ -83,11 +93,6 @@ def getReviewsByUserId():
 def uploadGunLaws():
     dcapi.postGunLaws()
     return 'update'
-
-@app.route('/updateCrimes')
-def test_db():
-    dcapi.updateCrimes(40.520911, -74.461223, .1)
-    return 'updateCrimes'
 
 def checkValidString(string):
     if string == None or len(string) < 1:
