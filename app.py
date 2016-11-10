@@ -37,8 +37,7 @@ def update_crimes():
     radius = request.args.get('radius','')
     if checkValidString(lat) and checkValidString(lon) and checkValidString(radius) and checkValidString(radius):
         return json.dumps({'status' : 'ok', 'message' : dcapi.updateCrimes(float(lat), float(lon), float(radius))})
-    return json.dumps({'status' : 'error', 'message' : 'invalud arguments'})    
-
+    return json.dumps({'status' : 'error', 'message' : 'invalud arguments'})
 
 
 @app.route('/getCrimes')
@@ -86,7 +85,7 @@ def getReviewsByUserId():
     if not checkValidString(userId):
         return json.dumps({'status' : 'error', 'message' : 'please enter a valid userId'})
     else:
-        results = dcapi.getReviews(userId)
+        results = dcapi.getReviewsByUserId(userId)
         return json.dumps({'status' : 'ok' , 'results' : results})
 
 @app.route('/updateGunLaws')

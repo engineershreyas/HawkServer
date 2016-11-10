@@ -145,11 +145,11 @@ def getReviews(lat, lon, radius):
     delta = asin(sin(angularRadius)/cos(latr))
     lonmin = lonr - delta
     lonmax = lonr + delta
-    sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + latmin  + "AND lat <=  " +  latmax + " ) AND (lon >= " + lonmin + "AND lon <= " + lonmax + ") AND (ACOS(SIN(" + latr + ") * SIN(lat) + COS(" + latr + ") * COS(lat) * COS(lon - (" + lonr  + ")))) <= " + angularRadius
+    sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + str(latmin)  + " AND lat <=  " +  str(latmax) + ") AND (lon >= " + str(lonmin) + "AND lon <= " + str(lonmax) + ") AND (ACOS(SIN(" + str(latr) + ") * SIN(lat) + COS(" + str(latr) + ") * COS(lat) * COS(lon - (" + str(lonr)  + ")))) <= " + str(angularRadius)
     results = dbhelper.doOperation(sqlCommand, True, -1)
     return json.dumps(results)
 
-def getReviews(userId):
+def getReviewsByUserId(userId):
     sqlCommand = "SELECT * FROM reviews WHERE userId = " + wrapApos(userId)
     results = dbhelper.doOperation(sqlCommand, True, -1)
     return json.dumps(results)
