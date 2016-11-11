@@ -168,7 +168,9 @@ def degreesToRadians(degrees):
 
 #helper method to wrap variable in single apostrophes for sql statements s
 def wrapApos(word):
-    return "\'" + word + "\'"
+    if not word == None:
+        return "\'" + word + "\'"
+    return ""
 
 #helper method to create id for crime
 def generateId(date,lat,lon):
