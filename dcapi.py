@@ -12,7 +12,7 @@ def register(userId, email, password):
     password = password.encode('utf-8')
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     if not checkIfUserExists(userId, email):
-        sqlCommand = "INSERT INTO users VALUES (" + wrapApos(userId) + ", " + wrapApos(email) + ", " + wrapApos(hashed) + ")"
+        sqlCommand = "INSERT INTO users VALUES (" + wrapApos(userId) + ", " + wrapApos(hashed)  + ", " + wrapApos(email) + ")"
         result = dbhelper.doOperation(sqlCommand, False, 0)
         return result['status'] == 'ok'
 
