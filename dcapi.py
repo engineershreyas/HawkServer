@@ -54,6 +54,7 @@ def postGunLaws():
 def updateCrimes(lat, lon, radius):
     crimes = spotcrime.getCrimeData(lat, lon, radius)
     count = 0
+    notInserted = 0
     for crime in crimes:
         #the type of the crime
         cType = crime['type']
@@ -66,8 +67,9 @@ def updateCrimes(lat, lon, radius):
         count = count + 1
         success = putCrimeIfNecessary(cType, date, latitude, longitude)
         if success == False:
-            return "Insert failed with data: " + json.dumps(crime)
-    return str(count) + " crimes found"
+            print "Insert failed with data: " + json.dumps(crime)
+            notInserted = notInserted + 1
+    return str(count) + " crimes found, " + notInserted + " not inserted"
 
 def putCrimeIfNecessary(cType, date, lat, lon):
     cId = generateId(date, lat, lon)
