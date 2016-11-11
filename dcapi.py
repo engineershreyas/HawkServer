@@ -81,7 +81,7 @@ def putCrime(cId, cType, date, lat, lon):
     sqlCommand = "INSERT INTO crimes VALUES (" + wrapApos(cId) + ", " + wrapApos(cType) + ", " + wrapApos(date) + ", " + wrapApos(cityState) + "," + str(degreesToRadians(float(lat))) + "," + str(degreesToRadians(float(lon))) + ")"
     if not cityState == None:
         result = dbhelper.doOperation(sqlCommand, False, 0)
-        if result['status'] == 'error':
+        if result == None or result['status'] == 'error':
             return False
         else:
             return True
