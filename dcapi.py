@@ -69,7 +69,7 @@ def updateCrimes(lat, lon, radius):
         if success == False:
             print "Insert failed with data: " + json.dumps(crime)
             notInserted = notInserted + 1
-    return str(count) + " crimes found, " + notInserted + " not inserted"
+    return str(count) + " crimes found, " + str(notInserted) + " not inserted"
 
 def putCrimeIfNecessary(cType, date, lat, lon):
     cId = generateId(date, lat, lon)
