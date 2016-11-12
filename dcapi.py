@@ -15,6 +15,7 @@ def register(userId, email, password):
         sqlCommand = "INSERT INTO users VALUES (" + wrapApos(userId) + ", " + wrapApos(hashed)  + ", " + wrapApos(email) + ")"
         result = dbhelper.doOperation(sqlCommand, False, 0)
         return result['status'] == 'ok'
+    return False
 
 def login(userId, password):
     password = password.encode('utf-8')
