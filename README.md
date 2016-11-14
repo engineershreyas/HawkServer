@@ -28,4 +28,110 @@ This is to be used to populate our personal database, not to show data to the cl
 ### gunlaws.py
 This module has basic helper functions for returning abbreviations of all 50 states in the USA and a dictionary mapping those states to their gun law types, which can either be OC (Open Carry), CC (Concealed Carry), or NC (No Carry). Note that this data is generalized and is categorized based on state law and de facto law, actual data may vary for specific areas within a state.
 
+## Endpoints
+
+* /register, method=POST
+  * parameters
+    * userId : String
+    * email : String
+    * password: String
+  * response
+    * success
+      ```
+      {"status" : "ok", "message" : "Registration successful!", "userId" : "<returns userId back to confirm>"}
+      ```
+    * failure
+       ```
+       {"status" : "error", "message" : "Something went wrong, please try again!"}
+       ```
+* /login, method=POST
+  * parameters
+    * userId : String
+    * password : String
+  * response
+    * success
+      ```
+      {"status": "ok", "message" : "Login successful!", "userId" : "<returns userId back to confirm>"}
+      ```
+    * failure
+      ```
+      {"status" : "error", "message" : "'Login was not successful! Please make sure your user id or password is correct'"}
+      ```
+* /updateCrimes, method=POST
+  * parameters
+    * lat : Double
+    * lon : Double
+    * radius : Double
+  * response
+    * success
+      ```
+      {"status" : "ok", "message" : "<# of crimes found> crimes found, <# of crimes not inserted> not inserted"}
+      ```
+    * failure
+      ```
+      {"status" : "error", "message" : "invalid arguments"}
+      ```
+ * /getCrimes, method=GET
+   * parameters
+      * lat : Double
+      * lon : Double
+      * radius : Double
+   * response
+      * success
+      ```
+      {"status" : "ok", "results" : [array of  crime objects]}
+      ```
+      * failure
+      ```
+      {"status" : "error", "message" : "invalid arguments"}
+      ```
+* /createReview, method=POST
+  * parameters
+    * rating : Double
+    * lat : Double
+    * lon : Double
+    * comments : String
+    * userId : String
+  * response
+    * success
+    ```
+    {"status" : "success", "rId" : <id of the rating>}
+    ```
+    * failure
+    ```
+    {"status" : "error", "message" : "Posting review failed, please try again!"}
+    ```
+* /getReviews, method=GET
+  * parameters
+    * lat : Double
+    * lon : Double
+    * radius : Double  
+  * response
+     * success
+     ```
+     {"status" : "ok", "results" : [array of  review objects]}
+     ```
+     * failure
+     ```
+     {"status" : "error", "message" : "invalid arguments"}
+     ```
+* /getReviewsByUserId, method=GET
+  * parameters
+    * userId : String
+  * response
+    * success
+    ```
+    {"status" : "ok", "results" : [array of review objects]}
+    ```
+    * failure
+    ```
+    {"status" : "error", "message" : "please enter a valid user id"}
+    ```
+* /updateGunLaws, method=GET
+  * parameters
+    * None
+  * response
+    * None
+      
+
 # IN PROGRESS
