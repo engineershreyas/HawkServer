@@ -26,7 +26,7 @@ def login():
     password = request.form['password']
     success = dcapi.login(userId, password)
     if success == False:
-        return json.dumps({'status' : 'error', 'message' : 'Login was not successful! Please make sure your email or password is correct'})
+        return json.dumps({'status' : 'error', 'message' : 'Login was not successful! Please make sure your user id or password is correct'})
     else:
         return json.dumps({'status' : 'ok', 'message' : 'Login successful!', 'userId' : userId})
 
@@ -37,7 +37,7 @@ def update_crimes():
     radius = request.args.get('radius','')
     if checkValidString(lat) and checkValidString(lon) and checkValidString(radius) and checkValidString(radius):
         return json.dumps({'status' : 'ok', 'message' : dcapi.updateCrimes(float(lat), float(lon), float(radius))})
-    return json.dumps({'status' : 'error', 'message' : 'invalud arguments'})
+    return json.dumps({'status' : 'error', 'message' : 'invalid arguments'})
 
 
 @app.route('/getCrimes')
@@ -83,7 +83,7 @@ def getReviews():
 def getReviewsByUserId():
     userId = request.args.get('userId','')
     if not checkValidString(userId):
-        return json.dumps({'status' : 'error', 'message' : 'please enter a valid userId'})
+        return json.dumps({'status' : 'error', 'message' : 'please enter a valid user id'})
     else:
         results = dcapi.getReviewsByUserId(userId)
         return json.dumps({'status' : 'ok' , 'results' : results})
