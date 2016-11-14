@@ -74,7 +74,7 @@ def getReviews():
             results = dcapi.getReviews(float(lat), float(lon), float(radius))
             return json.dumps({'status' : 'ok', 'results' : results})
         except ValueError:
-            return json.dumps({'status' : 'error', 'message' : 'arguments were not all numbers'})
+            return json.dumps({'status' : 'error', 'message' : 'invalid arguments'})
     else:
         return json.dumps({'status' : 'error', 'messgae' : 'invalid arguments'})
 
