@@ -18,15 +18,19 @@ def register(userId, email, password):
     return False
 
 def login(userId, password):
-    password = password.encode('utf-8')
-    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    password = password.encode('utf-8') 
     sqlCommand = "SELECT hashed FROM users WHERE userId = " + wrapApos(userId)
     result = dbhelper.doOperation(sqlCommand, True, 1)
     if result == None:
+        print "nothing found!" 
         return False
     else:
-        if result['hashed'] == hashed:
+        hashed = result['hashed']
+        hashed = hashed.encode('utf-8')
+        if bcrypt.hashpw(password, hashed) == hashed:
+            print "password matched" 
             return True
+        print "wrong password, received = " + encodedPassword + ", expected = " + result['hashed']
         return False
 
 def checkIfUserExists(userId, email):
