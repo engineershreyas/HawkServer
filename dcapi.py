@@ -111,7 +111,7 @@ def getCrimes(lat, lon, radius):
     sqlCommand = "SELECT * FROM crimes WHERE (lat >= " + str(latmin)  + " AND lat <=  " +  str(latmax) + ") AND (lon >= " + str(lonmin) + "AND lon <= " + str(lonmax) + ") AND (ACOS(SIN(" + str(latr) + ") * SIN(lat) + COS(" + str(latr) + ") * COS(lat) * COS(lon - (" + str(lonr)  + ")))) <= " + str(angularRadius)
     results = {}
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return json.dumps(results)
+    return results
 
 """Safety Review Related Methods"""
 def postReview(rating, lat, lon, comments, userId):
@@ -124,23 +124,23 @@ def postReview(rating, lat, lon, comments, userId):
     numOfReviews = int(cityInfo['numOfReviews'])
     totalScore = score * numOfReviews
     numOfReviews = numOfReviews + 1;
-    totalScore = (totalScore + rating) / float(numOfReviews)
-    updateSqlCommand = "UPDATE cities SET score = " + totalScore + ", numOfReviews = " + numOfReviews + " WHERE name = " + city
+    totalScore = (totalScore + float(rating)) / float(numOfReviews)
+    updateSqlCommand = "UPDATE cities SET score = " + str(totalScore) + ", numOfReviews = " + str(numOfReviews) + " WHERE name = " + city
     message = None
     res = dbhelper.doOperation(updateSqlCommand, False, 0)
-    if res['status'] == 'error':
+    if res is not None and res['status'] == 'error':
         print 'Updating cities failed'
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
         return message
     latr = degreesToRadians(float(lat))
     lonr = degreesToRadians(float(lon))
-    insertSqlCommand = "INSERT INTO reviews VALUES (" + rId + ", " + rating + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + + "," + latr + "," + lonr + ")"
+    insertSqlCommand = "INSERT INTO reviews VALUES (" + str(rId) + ", " + str(rating) + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + "," + str(latr) + "," + str(lonr) + ")"
     res = dbhelper.doOperation(insertSqlCommand, False, 0)
     if res['status'] == 'error':
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
         return message
     rId = getReviewCount() - 1
-    return {'status' : 'success', 'rId' : rId}
+    return {'status' : 'ok', 'rId' : rId}
 
 def getReviews(lat, lon, radius):
     kilometers = radius * 1600
@@ -155,12 +155,12 @@ def getReviews(lat, lon, radius):
     lonmax = lonr + delta
     sqlCommand = "SELECT * FROM reviews WHERE (lat >= " + str(latmin)  + " AND lat <=  " +  str(latmax) + ") AND (lon >= " + str(lonmin) + "AND lon <= " + str(lonmax) + ") AND (ACOS(SIN(" + str(latr) + ") * SIN(lat) + COS(" + str(latr) + ") * COS(lat) * COS(lon - (" + str(lonr)  + ")))) <= " + str(angularRadius)
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return json.dumps(results)
+    return results
 
 def getReviewsByUserId(userId):
     sqlCommand = "SELECT * FROM reviews WHERE userId = " + wrapApos(userId)
     results = dbhelper.doOperation(sqlCommand, True, -1)
-    return json.dumps(results)
+    return results
 
 def getReviewCount():
     sqlCommand = "SELECT * FROM reviews"
