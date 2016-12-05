@@ -52,7 +52,7 @@ def getCrimes():
         except ValueError:
             return json.dumps({'status' : 'error', 'message' : 'arguments were not all numbers'})
     else:
-        return json.dumps({'status' : 'error', 'messgae' : 'invalid arguments'})
+        return json.dumps({'status' : 'error', 'message' : 'invalid arguments'})
 
 @app.route('/createReview', methods=['POST'])
 def createReview():
@@ -63,6 +63,20 @@ def createReview():
     userId = request.form['userId']
     message = dcapi.postReview(rating, lat, lon, comments, userId)
     return json.dumps(message)
+
+@app.route('/voteForReview', methods=['POST'])
+def voteForReview():
+    rId = request.form['rId']
+    userId = request.form['userId']
+    upvote = request.form['upvote']
+    result = dcapi.voteForReview(rId, userId, upvote)
+    return json.dumps(result)
+
+@app.route('/getVotedReviews')
+def getVotedReviews():
+    userId = request.form['userId']
+    result = dcapi.getVoted(userId)
+    return json.dumps(result)
 
 @app.route('/getReviews')
 def getReviews():

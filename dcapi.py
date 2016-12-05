@@ -125,7 +125,7 @@ def postReview(rating, lat, lon, comments, userId):
     totalScore = score * numOfReviews
     numOfReviews = numOfReviews + 1;
     totalScore = (totalScore + float(rating)) / float(numOfReviews)
-    updateSqlCommand = "UPDATE cities SET score = " + str(totalScore) + ", numOfReviews = " + str(numOfReviews) + " WHERE name = " + city
+    updateSqlCommand = "UPDATE cities SET score = " + str(totalScore) + ", numOfReviews = " + str(numOfReviews) + " WHERE name = " + wrapApos(city)
     message = None
     res = dbhelper.doOperation(updateSqlCommand, False, 0)
     if res is not None and res['status'] == 'error':
@@ -141,6 +141,34 @@ def postReview(rating, lat, lon, comments, userId):
         return message
     rId = getReviewCount() - 1
     return {'status' : 'ok', 'rId' : rId}
+
+def getVoted(userId):
+    searchVoteSqlCommand = "SELECT rId FROM votes WHERE userId = " + wrapApos(userId)
+    return dbhelper.doOperation(searchVoteSqlCommand, True, 0)
+    
+def voteForReview(rId, userId, upvote):
+    searchVoteSqlCommand = "SELECT * FROM votes WHERE rId = " + str(rId) + " AND userId = " + wrapApos(userId)
+    res = dbhelper.doOperation(searchVoteSqlCommand, True, 1)
+    if res is not None:
+        return {'status' : 'error', 'error' : 'you have already voted for this post'}
+    else:
+        val = upvote ? 1 : -1
+        insertVoteSqlCommand = "INSERT INTO votes VALUES (" + str(rId) + ", " + wrapApos(userId) + ", " + str(val)
+        res1 = dbhelper.doOperation(insertVoteSqlCommand, False, -1)
+        if res1['status'] == 'error':
+            message = {'status' : 'error', 'message' : 'Voting for review failed, please try again!'}
+            return message
+        getVotesForReviewSqlCommand = "SELECT votes FROM reviews WHERE rId = " + str(rId)
+        res2 = dbhelper.doOperation(getVotesForReviewSqlCommand, True, 1)
+        votes = res2['votes']
+        votes = votes + val
+        updateReviewSqlCommand = "UPDATE reviews SET votes = " + str(votes) + " WHERE rId = " + str(rId)
+        res3 = dbhelper.doOperation(updateReviewSqlCommand, False, -1)
+        if res3['status'] == 'ok':
+            return {'status' : 'ok', 'rId' : rId}
+        else:
+            message = {'status' : 'error', 'message' : 'Voting for review failed, please try again!'}
+            return message
 
 def getReviews(lat, lon, radius):
     kilometers = radius * 1600
