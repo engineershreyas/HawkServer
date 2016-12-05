@@ -157,14 +157,16 @@ def voteForReview(rId, userId, upvote):
             val = 1
         else:
             val = -1
-        insertVoteSqlCommand = "INSERT INTO votes VALUES (" + str(rId) + ", " + wrapApos(userId) + ", " + str(val)
+        insertVoteSqlCommand = "INSERT INTO votes VALUES (" + str(rId) + ", " + wrapApos(userId) + ", " + str(val) + ")"
         res1 = dbhelper.doOperation(insertVoteSqlCommand, False, -1)
         if res1['status'] == 'error':
             message = {'status' : 'error', 'message' : 'Voting for review failed, please try again!'}
             return message
-        getVotesForReviewSqlCommand = "SELECT votes FROM reviews WHERE rId = " + str(rId)
+        getVotesForReviewSqlCommand = "SELECT * FROM reviews WHERE rId = " + str(rId)
         res2 = dbhelper.doOperation(getVotesForReviewSqlCommand, True, 1)
         votes = res2['votes']
+        if votes is None:
+            votes = 0
         votes = votes + val
         updateReviewSqlCommand = "UPDATE reviews SET votes = " + str(votes) + " WHERE rId = " + str(rId)
         res3 = dbhelper.doOperation(updateReviewSqlCommand, False, -1)

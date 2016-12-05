@@ -74,8 +74,9 @@ def voteForReview():
 
 @app.route('/getVotedReviews')
 def getVotedReviews():
-    userId = request.form['userId']
+    userId = request.args.get('userId','')
     result = dcapi.getVoted(userId)
+    result = {'votes' : result}
     return json.dumps(result)
 
 @app.route('/getReviews')
