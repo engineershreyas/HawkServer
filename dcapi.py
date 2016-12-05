@@ -152,7 +152,11 @@ def voteForReview(rId, userId, upvote):
     if res is not None:
         return {'status' : 'error', 'error' : 'you have already voted for this post'}
     else:
-        val = upvote ? 1 : -1
+        val = 0
+        if upvote:
+            val = 1
+        else:
+            val = -1
         insertVoteSqlCommand = "INSERT INTO votes VALUES (" + str(rId) + ", " + wrapApos(userId) + ", " + str(val)
         res1 = dbhelper.doOperation(insertVoteSqlCommand, False, -1)
         if res1['status'] == 'error':
