@@ -143,9 +143,9 @@ def postReview(rating, lat, lon, comments, userId):
     return {'status' : 'ok', 'rId' : rId}
 
 def getVoted(userId):
-    searchVoteSqlCommand = "SELECT rId FROM votes WHERE userId = " + wrapApos(userId)
+    searchVoteSqlCommand = "SELECT * FROM votes WHERE userId = " + wrapApos(userId)
     return dbhelper.doOperation(searchVoteSqlCommand, True, 0)
-    
+
 def voteForReview(rId, userId, upvote):
     searchVoteSqlCommand = "SELECT * FROM votes WHERE rId = " + str(rId) + " AND userId = " + wrapApos(userId)
     res = dbhelper.doOperation(searchVoteSqlCommand, True, 1)
