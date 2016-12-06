@@ -135,7 +135,7 @@ def postReview(rating, lat, lon, comments, userId):
         return message
     latr = degreesToRadians(float(lat))
     lonr = degreesToRadians(float(lon))
-    t = time.strftime("%d/%m/%Y %I:%M:%S")
+    t = time.strftime("%d/%m/%Y %H:%M:%S")
     insertSqlCommand = "INSERT INTO reviews VALUES (" + str(rId) + ", " + str(rating) + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + "," + str(latr) + "," + str(lonr) + "," + str(0) + "," + wrapApos(t) + ")"
     res = dbhelper.doOperation(insertSqlCommand, False, 0)
     if res['status'] == 'error':
