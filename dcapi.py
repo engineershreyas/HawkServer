@@ -4,6 +4,7 @@ import spotcrime
 import bcrypt
 import gunlaws
 import json
+import time
 from math import asin, acos, sin, cos
 
 
@@ -134,7 +135,8 @@ def postReview(rating, lat, lon, comments, userId):
         return message
     latr = degreesToRadians(float(lat))
     lonr = degreesToRadians(float(lon))
-    insertSqlCommand = "INSERT INTO reviews VALUES (" + str(rId) + ", " + str(rating) + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + "," + str(latr) + "," + str(lonr) + ")"
+    t = time.strftime("%d/%m/%Y %I:%M:%S")
+    insertSqlCommand = "INSERT INTO reviews VALUES (" + str(rId) + ", " + str(rating) + ", " + wrapApos(cityState) + ", " + wrapApos(comments) + ", " + wrapApos(userId) + "," + str(latr) + "," + str(lonr) + "," + wrapApos(t) + ")"
     res = dbhelper.doOperation(insertSqlCommand, False, 0)
     if res['status'] == 'error':
         message = {'status' : 'error', 'message' : 'Posting review failed, please try again!'}
