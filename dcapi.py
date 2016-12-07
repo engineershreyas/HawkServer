@@ -200,6 +200,49 @@ def getReviewCount():
     result = dbhelper.doOperation(sqlCommand, True, -1)
     return len(result)
 
+"""City Related Methods"""
+def getCityScore(lat, lon):
+    citystate = getCityState(lat, lon)
+    cityandstate = citystate.split(",")
+    city = cityandstate[0]
+    getCitySqlCommand = "SELECT * FROM cities WHERE name = " + wrapApos(city)
+    res1 = dbhelper.doOperation(getCitySqlCommand, True, 1)
+    if res1 is not None:
+        score = res1['score']
+        return {'score' : score, 'citystate' : citystate}
+    return -1
+
+def getCrimesInWindow(lat, lon, window):
+    citystate = getCityState(lat, lon)
+    getCrimesByCitySqlCommand = "SELECT * FROM crimes WHERE citystate = " + wrapApos(citystate)
+    res2 = dbhelper.doOperation(getCrimesByCitySqlCommand, True, 0)
+    count = 0
+    arrests = 0
+    for crime in res2:
+        date = crime["occurredAt"]
+        dateTerms = date.split()
+        mmddyy = dateTerms[0].split("/")
+        currTimeYear = time.strftime("%Y")
+        currTimeMonth = time.strftime("%m")
+        currYY = currTimeYear[2] + currTimeYear[3]
+        print str(mmddyy)
+        yy = mmddyy[2]
+        if int(currYY) - int(yy) <= 1:
+            mm = mmddyy[0]
+            mm = int(mm)
+            currTimeMonth = int(currTimeMonth)
+            mm = mm % 12
+            currTimeMonth = currTimeMonth % 12
+            if window > 12:
+                window = 12
+            if abs(mm - currTimeMonth) <= window:
+                if crime['cType'] is not "Arrest":
+                    count = count + 1
+                else:
+                    arrests = arrests + 1
+    return {'count' : count, 'arrests' : arrests}
+
+
 """HELPER METHODS"""
 
 def degreesToRadians(degrees):

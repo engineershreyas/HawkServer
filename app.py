@@ -103,6 +103,22 @@ def getReviewsByUserId():
         results = dcapi.getReviewsByUserId(userId)
         return json.dumps({'status' : 'ok' , 'results' : results})
 
+@app.route('/getCityScore')
+def getCityScore():
+    lat = request.args.get('lat',0.0)
+    lon = request.args.get('lon',0.0)
+    res = dcapi.getCityScore(lat, lon)
+    return json.dumps(res)
+
+@app.route('/getCityCrimesCount')
+def getCityCrimesCount():
+    lat = request.args.get('lat',0.0)
+    lon = request.args.get('lon',0.0)
+    window = request.args.get('window','')
+    res = dcapi.getCrimesInWindow(lat,lon,window)
+    return json.dumps(res)
+
+
 @app.route('/updateGunLaws')
 def uploadGunLaws():
     dcapi.postGunLaws()
