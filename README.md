@@ -133,5 +133,3 @@ This module has basic helper functions for returning abbreviations of all 50 sta
   * response
     * None
       
-
-# IN PROGRESS
